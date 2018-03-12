@@ -84,7 +84,7 @@ int can_err_cnt = 0;
   CAN_TypeDef *cans[] = {CAN1, CAN2, CAN3};
   uint8_t bus_lookup[] = {0,1,2};
   uint8_t can_num_lookup[] = {0,1,2,-1};
-  int8_t can_forwarding[] = {-1,-1,-1,-1};
+  int8_t can_forwarding[] = {0,1,-1,-1};
   uint32_t can_speed[] = {5000, 5000, 5000, 333};
   #define CAN_MAX 3
 #else
@@ -348,7 +348,14 @@ void can_rx(uint8_t can_number) {
 
     // forwarding (panda only)
     #ifdef PANDA
-      int bus_fwd_num = can_forwarding[bus_number] != -1 ? can_forwarding[bus_number] : safety_fwd_hook(bus_number, &to_push);
+      int bus_fwd_num = 0;
+      // Disable steering command to be forwarded from bus 1 to 0 (or maybe the other way around)
+      if((can_forwarding[bus_number] != -1) && !((bus_number == 0) && (to_push.RIR >> 21) == 0xE4)){
+          bus_fwd_num = can_forwarding[bus_number];
+          }
+      else{
+          bus_fwd_num = safety_fwd_hook(bus_number, &to_push);
+          }
       if (bus_fwd_num != -1) {
         CAN_FIFOMailBox_TypeDef to_send;
         to_send.RIR = to_push.RIR | 1; // TXRQ
