@@ -561,6 +561,8 @@ int main() {
     #define CLICKS 8
   #endif
 
+  can_set_forwarding(1, 0 & CAN_BUS_NUM_MASK);
+
   for (cnt=0;;cnt++) {
     can_live = pending_can_live;
 
