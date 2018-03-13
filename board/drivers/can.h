@@ -349,8 +349,14 @@ void can_rx(uint8_t can_number) {
     // forwarding (panda only)
     #ifdef PANDA
       int bus_fwd_num = 0;
-      // Disable braking command to be forwarded from bus 1 to 0 (or maybe the other way around)
-      if((can_forwarding[bus_number] != -1) && !((bus_number == 1) && (to_push.RIR >> 21) == 0x200)){
+      // Disable gas, steer & brake command to be forwarded from bus 1 to 0 (or maybe the other way around)
+      if((can_forwarding[bus_number] != -1) && !((bus_number == 1) && 
+          (  
+             ((to_push.RIR >> 21) == 0x200) || 
+              ((to_push.RIR >> 21) == 0xE4)  || 
+              ((to_push.RIR >> 21) == 0x1FA) 
+          ) )
+         ){
           bus_fwd_num = can_forwarding[bus_number];
           }
       else{
