@@ -535,8 +535,11 @@ int main() {
 
   // default to silent mode to prevent issues with Ford
   safety_set_mode(SAFETY_ALLOUTPUT, 0);
-  can_silent = ALL_CAN_SILENT;
+  can_silent = ALL_CAN_LIVE; //ALL_CAN_SILENT;
   can_init_all();
+
+  // Force the forwarding to happen from boot
+  can_set_forwarding(1, 0 & CAN_BUS_NUM_MASK);
 
   adc_init();
 
@@ -561,8 +564,8 @@ int main() {
     #define CLICKS 8
   #endif
 
-  // Force the forwarding to happen from boot
-  can_set_forwarding(1, 0 & CAN_BUS_NUM_MASK);
+  safety_set_mode(SAFETY_ALLOUTPUT, 0);
+  can_silent = ALL_CAN_LIVE;
 
   for (cnt=0;;cnt++) {
     can_live = pending_can_live;
